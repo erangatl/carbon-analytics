@@ -30,14 +30,15 @@ import Header from '../common/Header';
 //Material UI
 import {GridList, GridTile} from 'material-ui/GridList';
 import HomeButton from 'material-ui/svg-icons/action/home';
-import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, RaisedButton, Snackbar, Toggle} from 'material-ui';
-import {Button, Typography} from 'material-ui-next';
+import {Card, CardHeader, CardText, Dialog, Divider, FlatButton, Snackbar} from 'material-ui';
+import {Button, Typography, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel} from 'material-ui-next';
 import DashboardUtils from '../utils/DashboardUtils';
 import AuthenticationAPI from '../utils/apis/AuthenticationAPI';
 import AuthManager from '../auth/utils/AuthManager';
 import Error403 from '../error-pages/Error403';
 import StatusDashboardOverViewAPI from '../utils/apis/StatusDashboardOverViewAPI';
 import AppEventFlow from "./AppEventFlow";
+import '../../public/css/dashboard.css';
 // Localization
 import { FormattedMessage } from 'react-intl';
 
@@ -155,11 +156,13 @@ export default class WorkerSpecific extends React.Component {
             confirmMessage: '',
             hasManagerPermission: false,
             hasViewerPermission: true,
-            sessionInvalid: false
+            sessionInvalid: false,
+            radioValue: 'off'
         };
         this.handleToggle = this.handleToggle.bind(this);
         this.showMessage = this.showMessage.bind(this);
         this.showError = this.showError.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     componentWillMount() {
@@ -376,6 +379,11 @@ export default class WorkerSpecific extends React.Component {
      * @param workersList
      * @returns {XML}
      */
+
+    handleChange(event) {
+        this.setState({ radioValue: event.target.value });
+    };
+
     renderToggle() {
         const enableMessage = this.context.intl.formatMessage(
             {
@@ -390,43 +398,22 @@ export default class WorkerSpecific extends React.Component {
 
         if (this.state.hasManagerPermission) {
             return (
-                <div style={{position: 'absolute', right: 24, top: 100}}>
-                    <Toggle labelPosition="left"
-                            label={<FormattedMessage id='metrics' defaultMessage='Metrics' />}
-                            labelStyle={{color: 'white'}}
-                            thumbStyle={{backgroundColor: 'grey'}}
-                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            toggled={this.state.statsEnabled}
-                            onToggle={() => {
-                                this.setState({
-                                    open: true,
-                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                })
-                            }}
-                    >
-                    </Toggle>
-
-                </div>
-            )
-        } else {
-            return (
-                <div style={{float: 'right', padding: 20, paddingRight: 20, display: 'none'}}>
-                    <Toggle labelPosition="left"
-                            label={<FormattedMessage id='metrics' defaultMessage='Metrics' />}
-                            labelStyle={{color: 'white'}}
-                            thumbStyle={{backgroundColor: 'grey'}}
-                            thumbSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            trackSwitchedStyle={{backgroundColor: '#f17b31'}}
-                            toggled={this.state.statsEnabled}
-                            onToggle={() => {
-                                this.setState({
-                                    open: true,
-                                    confirmMessage: this.state.statsEnabled ? disableMessage : enableMessage
-                                })
-                            }}
-                    >
-                    </Toggle>
+                <div style={{position: 'absolute', right: 15, top: 110}}>
+                    <FormControl component="fieldset">
+                        <FormLabel style={{color: '#dedede'}} component="legend">Metrics:</FormLabel>
+                        <RadioGroup
+                            aria-label="metrics"
+                            name="metrics"
+                            value={this.state.radioValue}
+                            onChange={this.handleChange}
+                            style={{flexDirection: 'row', marginTop: '-30px', paddingLeft: 70}}
+                            className={'metricsRadio'}
+                        >
+                            <FormControlLabel value="off" control={<Radio />} label="Off" />
+                            <FormControlLabel value="basic" control={<Radio />} label="Basic" />
+                            <FormControlLabel value="detail" control={<Radio />} label="Detail" />
+                        </RadioGroup>
+                    </FormControl>
                 </div>
             )
         }
